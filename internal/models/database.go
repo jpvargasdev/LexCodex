@@ -22,7 +22,6 @@ var initialCategories = []CategorySeed{
 	{"Investments", "Savings"},
 	{"Debt Repayment", "Savings"},
 	{"Short Term", "Savings"},
-	{"Travels", "Savings"},
 	{"Savings", "Savings"},
 	{"Interests Earned", "Savings"},
 
@@ -45,6 +44,7 @@ var initialCategories = []CategorySeed{
 	{"Hobbies", "Wants"},
 	{"Taxi", "Wants"},
 	{"Restaurants", "Wants"},
+  {"Travels", "Wants"},
 
 	{"Transfer", "Transfer"},
 	{"Salary", "Income"},
