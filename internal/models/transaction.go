@@ -325,15 +325,9 @@ func AddTransaction(transaction Transaction) (Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	sourceAccount, err := GetAccountByID(transaction.AccountID, transaction.UserID)
+	_, err := GetAccountByID(transaction.AccountID, transaction.UserID)
 	if err != nil {
 		return Transaction{}, fmt.Errorf("invalid account: %v", err)
-	}
-
-	if transaction.TransactionType == TransactionTypeExpense {
-		if sourceAccount.Balance < transaction.Amount {
-			return Transaction{}, fmt.Errorf("insufficient balance in account: %v", err)
-		}
 	}
 
 	// Determine the main category based on the subcategory
@@ -656,7 +650,7 @@ func AddTransfer(transaction Transaction) (Transaction, error) {
 
 	// Update the account balance for the source account
 	_, err = tx.Exec(ctx,
-    `UPDATE accounts SET balance = balance - ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
+		`UPDATE accounts SET balance = balance - ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
 		transaction.Amount, transaction.Fees, transaction.AccountID,
 	)
 
@@ -667,7 +661,7 @@ func AddTransfer(transaction Transaction) (Transaction, error) {
 
 	// Update the account balance for the destination account
 	_, err = tx.Exec(ctx,
-    `UPDATE accounts SET balance = balance + ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
+		`UPDATE accounts SET balance = balance + ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
 		transaction.Amount, transaction.Fees, transaction.RelatedAccountID,
 	)
 
@@ -702,9 +696,9 @@ func DeleteTransaction(id string) error {
 	}()
 
 	// Fetch the transaction details to retrieve its amount and account ID
-	var transaction Transaction 
+	var transaction Transaction
 
-  log.Printf("Transaction ID: %s", id)
+	log.Printf("Transaction ID: %s", id)
 
 	err = tx.QueryRow(ctx,
 		`SELECT amount, account_id, related_account_id, transaction_type, fees
@@ -718,9 +712,9 @@ func DeleteTransaction(id string) error {
 		&transaction.Fees,
 	)
 
-  if err != nil {
-    return fmt.Errorf("Error retrieving transaction: %v", err)
-  }
+	if err != nil {
+		return fmt.Errorf("Error retrieving transaction: %v", err)
+	}
 
 	if err == sql.ErrNoRows {
 		tx.Rollback(ctx)
@@ -730,11 +724,11 @@ func DeleteTransaction(id string) error {
 		return fmt.Errorf("failed to retrieve transaction: %v", err)
 	}
 
-  log.Printf("Transaction ID 2: %s", id)
+	log.Printf("Transaction ID 2: %s", id)
 
 	// Reverse the balance change for the source account
 	_, err = tx.Exec(ctx,
-    `UPDATE accounts SET balance = balance + ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
+		`UPDATE accounts SET balance = balance + ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
 		transaction.Amount, transaction.Fees, transaction.AccountID,
 	)
 	if err != nil {
@@ -745,9 +739,9 @@ func DeleteTransaction(id string) error {
 	// If the transaction is a transfer, update the related account balance as well
 	if transaction.TransactionType == TransactionTypeTransfer ||
 		transaction.TransactionType == TransactionTypeSavings &&
-		transaction.RelatedAccountID.Valid && transaction.RelatedAccountID.String != "" {
+			transaction.RelatedAccountID.Valid && transaction.RelatedAccountID.String != "" {
 		_, err = tx.Exec(ctx,
-      `UPDATE accounts SET balance = balance - ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
+			`UPDATE accounts SET balance = balance - ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
 			transaction.Amount, transaction.Fees, transaction.RelatedAccountID,
 		)
 		if err != nil {

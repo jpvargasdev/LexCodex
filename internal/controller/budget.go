@@ -2,16 +2,23 @@ package controller
 
 import (
 	"guilliman/internal/models"
+	"guilliman/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Controller) GetBudgetSummaryController(c *gin.Context) {
+	uid, err := utils.GetUserUID(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	startDay := c.Query("start_day")
 	endDay := c.Query("end_day")
 
-	budgetSummary, err := models.GetBudgetSummary(startDay, endDay)
+	budgetSummary, err := models.GetBudgetSummary(startDay, endDay, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

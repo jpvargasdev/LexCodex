@@ -25,7 +25,7 @@ type BudgetSummary struct {
 }
 
 // GetBudgetSummary retrieves the budget summary based on a salary period
-func GetBudgetSummary(startDay string, endDay string) (BudgetSummary, error) {
+func GetBudgetSummary(startDay string, endDay string, uid string) (BudgetSummary, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -63,7 +63,10 @@ func GetBudgetSummary(startDay string, endDay string) (BudgetSummary, error) {
 
 	// Calculate net worth: sum of all account balances
 	err = db.QueryRow(ctx, `
-        SELECT COALESCE(SUM(balance), 0) FROM accounts`).Scan(&summary.NetWorth)
+    SELECT COALESCE(SUM(amount), 0)
+    FROM transactions
+    WHERE user_id = $1`, uid).Scan(&summary.NetWorth)
+
 	if err != nil {
 		return summary, fmt.Errorf("failed to retrieve net worth: %v", err)
 	}

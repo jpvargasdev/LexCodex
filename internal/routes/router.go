@@ -69,7 +69,9 @@ func SetupRouter() *gin.Engine {
 			// user.POST("/delete", c.DeleteUserController)
 		}
 	}
-  //	Health
+
+	r.POST("/helpers/recalculate_balances", c.RecalculateAllAccountBalances) // Recalculate all account balances
+	//	Health
 	r.GET("/health", c.HealthCheckController)
 
 	// Swagger
