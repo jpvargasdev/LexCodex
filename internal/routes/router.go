@@ -68,9 +68,12 @@ func SetupRouter() *gin.Engine {
 			user.POST("/create", c.CreateUserController)
 			// user.POST("/delete", c.DeleteUserController)
 		}
+		helpers := v1.Group("/helpers", middleware.AuthMiddleware())
+		{
+			helpers.POST("/recalculate-balances", c.RecalculateAllAccountBalances) // Recalculate all account balances
+		}
 	}
 
-	r.GET("/recalculate_balances", c.RecalculateAllAccountBalances) // Recalculate all account balances
 	//	Health
 	r.GET("/health", c.HealthCheckController)
 

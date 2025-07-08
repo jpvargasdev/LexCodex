@@ -5,9 +5,9 @@ import (
 	"fmt"
 )
 
-func RecalculateAllAccountBalances(ctx context.Context) error {
+func RecalculateAllAccountBalances(ctx context.Context, uid string) error {
 	// Primero, obtenemos todas las cuentas
-	rows, err := db.Query(ctx, `SELECT id FROM accounts`)
+	rows, err := db.Query(ctx, `SELECT id FROM accounts WHERE user_id = $1`, uid)
 	if err != nil {
 		return fmt.Errorf("failed to fetch accounts: %v", err)
 	}
