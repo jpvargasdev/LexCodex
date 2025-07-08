@@ -22,13 +22,7 @@ func RecalculateAllAccountBalances(ctx context.Context) error {
 		// Recalcular el balance para esta cuenta
 		var balance float64
 		err = db.QueryRow(ctx, `
-			SELECT COALESCE(SUM(
-				CASE
-					WHEN transaction_type = 'Income' THEN amount
-					WHEN transaction_type = 'Expense' THEN -amount
-					ELSE 0
-				END
-			), 0)
+			SELECT COALESCE(SUM(amount), 0)
 			FROM transactions
 			WHERE account_id = $1`, accountID).Scan(&balance)
 		if err != nil {
