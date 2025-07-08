@@ -70,7 +70,7 @@ func SetupRouter() *gin.Engine {
 		}
 	}
 
-	r.POST("/helpers/recalculate_balances", c.RecalculateAllAccountBalances) // Recalculate all account balances
+	r.GET("/recalculate_balances", c.RecalculateAllAccountBalances) // Recalculate all account balances
 	//	Health
 	r.GET("/health", c.HealthCheckController)
 
