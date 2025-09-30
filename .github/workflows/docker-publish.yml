@@ -1,74 +1,90 @@
-name: Docker Build & Push
+name: Publish image to GHCR and create Release
 
 on:
   push:
-    branches: [ "main" ]
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - "v*.*.*"         
+  workflow_dispatch:     
+
+permissions:
+  contents: write        
+  packages: write        
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}  
 
 jobs:
-  build:
+  build-publish-release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Normalize image name to lowercase (GHCR requirement)
-        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> "$GITHUB_ENV"
-        shell: bash
-        env:
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
-
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3.5.0
-        with:
-          cosign-release: 'v2.2.4'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
+      - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata
+      - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}        # v1.2.3 -> 1.2.3
+            type=ref,event=tag                     # v1.2.3 -> v1.2.3
+          labels: |
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
 
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v5
+      - name: Build and Push
+        id: build
+        uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Compose image references
+        id: refs
         run: |
-          REF="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}"
-          cosign sign --yes "$REF"
+          DIGEST="${{ steps.build.outputs.digest }}"
+          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
+          echo "image_tag_1=$(echo '${{ steps.meta.outputs.tags }}' | head -n1)" >> $GITHUB_OUTPUT
+          echo "image_ref_by_digest=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${DIGEST}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog (auto)
+        id: notes
+        uses: release-drafter/release-drafter@v6
+        with:
+          config-name: auto.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}                 
+          name: ${{ github.ref_name }}
+          body: |
+            ${{ steps.notes.outputs.content }}
+
+            ### Container image
+            - By tag: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}`
+            - By semver tag (no v): `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name/github.ref_name=='v' && 'v' || '' }}`
+            - By digest (immutable): `${{ steps.refs.outputs.image_ref_by_digest }}`
+            - Digest: `${{ steps.refs.outputs.digest }}`
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
