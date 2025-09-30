@@ -3,12 +3,12 @@ name: Publish image to GHCR and create Release
 on:
   push:
     tags:
-      - "v*.*.*"        # triggers on semver tags like v1.2.3
+      - "v*.*.*"
   workflow_dispatch:
 
 permissions:
-  contents: write       # create releases
-  packages: write       # push to GHCR
+  contents: write
+  packages: write
 
 env:
   REGISTRY: ghcr.io
@@ -21,6 +21,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Compute tag variants
+        id: tagvars
+        run: |
+          TAG="${GITHUB_REF_NAME}"      # e.g. v1.2.3
+          NO_V="${TAG#v}"               # -> 1.2.3
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "tag_no_v=${NO_V}" >> $GITHUB_OUTPUT
+          echo "image_tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}" >> $GITHUB_OUTPUT
+          echo "image_semver=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${NO_V}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -35,39 +45,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels)
+      # Optional: still add OCI labels; tags we set explicitly
+      - name: Extract metadata (labels only)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}}        # 1.2.3
-            type=ref,event=tag                     # v1.2.3
+          tags: ""   # avoid relying on this for tags
           labels: |
             org.opencontainers.image.source=${{ github.repositoryUrl }}
 
-      - name: Build and push container image
+      - name: Build and push
         id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           platforms: linux/amd64
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.tagvars.outputs.image_tag }}
+            ${{ steps.tagvars.outputs.image_semver }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Compute tag variants and image refs
-        id: tagvars
+      - name: Compose image refs
+        id: refs
         run: |
-          TAG="${GITHUB_REF_NAME}"      # e.g. v1.2.3
-          NO_V="${TAG#v}"               # -> 1.2.3
           DIGEST="${{ steps.build.outputs.digest }}"
-
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
-          echo "tag_no_v=${NO_V}" >> $GITHUB_OUTPUT
           echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
-          echo "image_by_tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}" >> $GITHUB_OUTPUT
-          echo "image_by_semver=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${NO_V}" >> $GITHUB_OUTPUT
           echo "image_by_digest=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${DIGEST}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
@@ -80,12 +84,12 @@ jobs:
 
             Container image references:
 
-            - By tag: `${{ steps.tagvars.outputs.image_by_tag }}`
-            - By semver (no v): `${{ steps.tagvars.outputs.image_by_semver }}`
-            - By digest (immutable): `${{ steps.tagvars.outputs.image_by_digest }}`
-            - Digest: `${{ steps.tagvars.outputs.digest }}`
+            - By tag: `${{ steps.tagvars.outputs.image_tag }}`
+            - By semver (no v): `${{ steps.tagvars.outputs.image_semver }}`
+            - By digest (immutable): `${{ steps.refs.outputs.image_by_digest }}`
+            - Digest: `${{ steps.refs.outputs.digest }}`
 
-            _Built on commit_ `${{ github.sha }}`.
+            _Built from commit_ `${{ github.sha }}`.
           draft: false
           prerelease: false
         env:
