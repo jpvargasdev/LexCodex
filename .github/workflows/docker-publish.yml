@@ -12,7 +12,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}   # ghcr.io/<owner>/<repo>
+  IMAGE_NAME: ${{ github.repository }}   
 
 jobs:
   build-publish-release:
@@ -25,8 +25,8 @@ jobs:
       - name: Compute tag variants
         id: tagvars
         run: |
-          TAG="${GITHUB_REF_NAME}"      # e.g. v1.2.3
-          NO_V="${TAG#v}"               # -> 1.2.3
+          TAG="${GITHUB_REF_NAME}"      
+          NO_V="${TAG#v}"               
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "tag_no_v=${NO_V}" >> $GITHUB_OUTPUT
           echo "image_tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}" >> $GITHUB_OUTPUT
@@ -45,13 +45,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Optional: still add OCI labels; tags we set explicitly
       - name: Extract metadata (labels only)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: ""   # avoid relying on this for tags
+          tags: ""   
           labels: |
             org.opencontainers.image.source=${{ github.repositoryUrl }}
 
@@ -77,7 +76,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}     # v1.2.3
+          tag_name: ${{ github.ref_name }}     
           name: ${{ github.ref_name }}
           body: |
             ## Release ${{ steps.tagvars.outputs.tag }}
