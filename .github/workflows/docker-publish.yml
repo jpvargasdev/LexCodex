@@ -12,7 +12,8 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}   
+  # Keep the human-friendly value; we'll derive a lowercase copy next.
+  IMAGE_NAME_RAW: ${{ github.repository }}
 
 jobs:
   build-publish-release:
@@ -22,15 +23,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Normalize image name to lowercase
+        id: imagename
+        run: |
+          echo "IMAGE_NAME_LOWER=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+          echo "IMAGE_NAME_LOWER=${GITHUB_REPOSITORY,,}"
+      
       - name: Compute tag variants
         id: tagvars
         run: |
-          TAG="${GITHUB_REF_NAME}"      
-          NO_V="${TAG#v}"               
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
-          echo "tag_no_v=${NO_V}" >> $GITHUB_OUTPUT
-          echo "image_tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${TAG}" >> $GITHUB_OUTPUT
-          echo "image_semver=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${NO_V}" >> $GITHUB_OUTPUT
+          TAG="${GITHUB_REF_NAME}"
+          NO_V="${TAG#v}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "tag_no_v=${NO_V}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_semver=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}:${NO_V}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -49,10 +56,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: ""   
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}
+          tags: ""
           labels: |
-            org.opencontainers.image.source=${{ github.repositoryUrl }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
 
       - name: Build and push
         id: build
@@ -70,13 +77,13 @@ jobs:
         id: refs
         run: |
           DIGEST="${{ steps.build.outputs.digest }}"
-          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
-          echo "image_by_digest=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${DIGEST}" >> $GITHUB_OUTPUT
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "image_by_digest=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LOWER }}@${DIGEST}" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}     
+          tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           body: |
             ## Release ${{ steps.tagvars.outputs.tag }}
