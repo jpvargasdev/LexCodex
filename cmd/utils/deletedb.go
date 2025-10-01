@@ -1,7 +1,7 @@
 package main
 
 import (
-	"guilliman/internal/models"
+	"lexcodex/internal/models"
 )
 
 func main() {

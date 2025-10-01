@@ -1,7 +1,15 @@
-# Guilliman
+# LexCodex
 
-Guilliman is a personal finance backend built in Go.  
-It helps track and analyze monthly expenses, with a focus on the **50/30/20 rule** and future plans for **AI/ML-driven recommendations** on spending, saving, and investing.
+“Order is the shield of Mankind. Law is its blade.” – attributed to Roboute Guilliman
+
+
+📜 About
+
+LexCodex is a Go backend for the sacred duty of personal finance management. Inspired by the eternal bureaucracy of the Imperium and the codifying will of Roboute Guilliman, it transforms mundane expenses into entries of law and decrees of compliance.
+Every transaction recorded is a tithe; every balance calculated is a judgment; every reconciliation an act of devotion to order. Chaos has no place here—only structure, discipline, and the incorruptible logic of the Codex.
+In the grim darkness of your wallet, there is only accounting.
+
+LexCodex helps track and analyze monthly expenses, with a focus on the **50/30/20 rule** and future plans for **AI/ML-driven recommendations** on spending, saving, and investing.
 
 ---
 

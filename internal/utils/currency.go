@@ -3,8 +3,8 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"guilliman/config"
 	"io"
+	"lexcodex/config"
 	"net/http"
 	"time"
 )
