@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"guilliman/internal/models"
-	"guilliman/internal/utils"
+	"lexcodex/internal/models"
+	"lexcodex/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

@@ -2,8 +2,8 @@ package controller
 
 import (
 	"context"
-	"guilliman/internal/models"
-	"guilliman/internal/utils"
+	"lexcodex/internal/models"
+	"lexcodex/internal/utils"
 	"net/http"
 	"time"
 

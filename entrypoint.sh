@@ -13,6 +13,6 @@ echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" | base64 -d > /app/firebase-config.j
 export GOOGLE_APPLICATION_CREDENTIALS="/app/firebase-config.json"
 
 # Start the Go application
-./guilliman  # Start the Go app
+./lexcodex  # Start the Go app
 
 wait

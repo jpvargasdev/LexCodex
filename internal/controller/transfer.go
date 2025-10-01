@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"guilliman/internal/models"
-	"guilliman/internal/utils"
+	"lexcodex/internal/models"
+	"lexcodex/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,10 +39,10 @@ func (h *Controller) TransferFundsController(c *gin.Context) {
 		return
 	}
 
-  if transfer.AccountID == transfer.RelatedAccountID {
-    c.JSON(http.StatusBadRequest, gin.H{"error": "Source and destination accounts cannot be the same"})
-    return
-  }
+	if transfer.AccountID == transfer.RelatedAccountID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Source and destination accounts cannot be the same"})
+		return
+	}
 
 	transfer.UserID = uid
 

@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"context"
-	"guilliman/cmd/auth"
-	"guilliman/config"
+	"lexcodex/cmd/auth"
+	"lexcodex/config"
 	"log"
 	"net/http"
 	"strings"

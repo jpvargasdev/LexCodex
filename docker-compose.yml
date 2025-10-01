@@ -2,12 +2,12 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15
-    container_name: guilliman_postgres
+    container_name: lexcodex_postgres
     restart: always
     environment:
-      POSTGRES_USER: guilliman
+      POSTGRES_USER: lexcodex
       POSTGRES_PASSWORD: secretpassword
-      POSTGRES_DB: guilliman_db
+      POSTGRES_DB: lexcodex_db
     ports:
       - "5432:5432"
     volumes:
@@ -23,7 +23,7 @@ services:
     volumes:
       - ./:/app
     command: ["air", "-c", ".air.toml"]
-    container_name: guilliman_app
+    container_name: lexcodex_app
     depends_on:
       - postgres
     environment:
@@ -31,7 +31,7 @@ services:
       EXCHANGE_RATE_API_KEY: ""
       GIN_MODE: "debug"
       GOOGLE_APPLICATION_CREDENTIALS: "./firebase-key.json"
-      DATABASE_URL: postgres://guilliman:secretpassword@postgres:5432/guilliman_db?sslmode=disable
+      DATABASE_URL: postgres://lexcodex:secretpassword@postgres:5432/lexcodex_db?sslmode=disable
 
 volumes:
   postgres_data:

@@ -1,4 +1,4 @@
-module guilliman
+module lexcodex
 
 go 1.23.2
 

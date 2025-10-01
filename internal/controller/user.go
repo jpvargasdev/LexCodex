@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"guilliman/internal/models"
+	"lexcodex/internal/models"
 	"log"
 	"net/http"
 

@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"guilliman/internal/controller"
-	"guilliman/internal/middleware"
+	"lexcodex/internal/controller"
+	"lexcodex/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"

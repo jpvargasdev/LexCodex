@@ -3,7 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
-	"guilliman/internal/utils/timeutils"
+	"lexcodex/internal/utils/timeutils"
 	"time"
 )
 

@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"guilliman/internal/models"
-	"guilliman/internal/utils"
-	"guilliman/internal/utils/timeutils"
+	"lexcodex/internal/models"
+	"lexcodex/internal/utils"
+	"lexcodex/internal/utils/timeutils"
 
 	"github.com/gin-gonic/gin"
 )

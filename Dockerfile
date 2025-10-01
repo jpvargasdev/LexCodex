@@ -17,7 +17,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go binary for the correct architecture
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=$GOARCH go build -o guilliman cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$GOARCH go build -o lexcodex cmd/server/main.go
 
 # Stage 2: Create a lightweight runtime image
 FROM alpine:latest
@@ -27,7 +27,7 @@ RUN apk add --no-cache jq
 WORKDIR /app
 
 # Copy only necessary files from builder stage
-COPY --from=builder /app/guilliman .
+COPY --from=builder /app/lexcodex .
 COPY init_db.sql .
 COPY seed_db.sql .
 COPY entrypoint.sh .
@@ -37,7 +37,7 @@ COPY wsgi.py .
 RUN chmod +x ./entrypoint.sh
 
 # Expose ports for Go app
-EXPOSE 8080 8081
+EXPOSE 8080 
 
 # Use entrypoint.sh to manage database initialization and app startup
 ENTRYPOINT [ "./entrypoint.sh" ]

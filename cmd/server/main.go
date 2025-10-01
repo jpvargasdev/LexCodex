@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	"guilliman/cmd/auth"
-	"guilliman/config"
-	"guilliman/internal/models"
-	"guilliman/internal/routes"
+	"lexcodex/cmd/auth"
+	"lexcodex/config"
+	"lexcodex/internal/models"
+	"lexcodex/internal/routes"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-// @title           Guilliman API
+// @title           LexCodex API
 // @version         1.0
-// @description     This is the Guilliman API
+// @description     This is the LexCodex API
 
 // @contact.name   Juan Vargas
-// @contact.url    https://github.com/jpvargasdev/guilliman
+// @contact.url    https://github.com/jpvargasdev/LexCodex
 
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
@@ -63,9 +63,9 @@ func main() {
 
 	port := config.GetServerPort()
 
-	fmt.Printf("Guilliman server is running on port %s...\n", port)
+	fmt.Printf("LexCodex server is running on port %s...\n", port)
 
 	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("Error starting Guilliman server: %v", err)
+		log.Fatalf("Error starting LexCodex server: %v", err)
 	}
 }
