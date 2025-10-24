@@ -25,7 +25,7 @@ func Load() {
 
 	Config.ServerPort = getEnv("SERVER_PORT", "8080")
 	Config.ExchangeRateKey = getEnv("EXCHANGE_RATE_KEY", "")
-	Config.SqlDb = getEnv("SQL_URL", "")
+	Config.SqlDb = getEnv("DATABASE_URL", "")
 	Config.SecretKey = getEnv("SECRET_KEY", "")
 	Config.Env = getEnv("ENV", "debug")
 }
