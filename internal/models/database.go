@@ -55,15 +55,32 @@ var initialCategories = []CategorySeed{
 var db *pgxpool.Pool
 
 func InitializeDatabase() {
-	dsn := os.Getenv("DATABASE_URL") // Example: "postgres://user:password@localhost:5432/dbname?sslmode=disable"
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		log.Fatal("DATABASE_URL not set")
+	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
 	var err error
 	db, err = pgxpool.New(ctx, dsn)
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		log.Fatalf("Failed to create pool: %v", err)
+	}
+
+	// Wait for the DB to actually be ready
+	maxRetries := 10
+	for i := 1; i <= maxRetries; i++ {
+		err = db.Ping(ctx)
+		if err == nil {
+			break
+		}
+		log.Printf("Database not ready (attempt %d/%d): %v", i, maxRetries, err)
+		time.Sleep(time.Duration(i) * time.Second)
+	}
+	if err != nil {
+		log.Fatalf("Database never became ready: %v", err)
 	}
 
 	log.Println("Connected to PostgreSQL")
