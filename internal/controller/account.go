@@ -63,9 +63,21 @@ func (h *Controller) AddAccountController(c *gin.Context) {
 		return
 	}
 
+	// Validate currency
+	if !utils.IsValidCurrency(newAccount.Currency) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid currency. Supported: SEK, USD, EUR, GBP, COP, MXN, etc."})
+		return
+	}
+
+	// Validate account type
+	if !utils.IsValidAccountType(newAccount.Type) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid account type. Supported: Bank, Credit Card, Cash, Savings, Investment, Checking, Digital Wallet"})
+		return
+	}
+
 	newAccount.UserID = uid
 
-	account, err := models.AddAccount(newAccount) // Add account to storage
+	account, err := models.AddAccount(newAccount)
 	if err != nil {
 		log.Printf("Error adding account: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add account"})

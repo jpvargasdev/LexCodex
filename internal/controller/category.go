@@ -37,6 +37,12 @@ func (h *Controller) CreateCategoryController(c *gin.Context) {
 		return
 	}
 
+	// Validate main category
+	if !utils.IsValidMainCategory(newCategory.MainCategory) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid main category. Supported: Needs, Wants, Savings, Income, Transfer"})
+		return
+	}
+
 	newCategory.UserID = uid
 
 	category, err := models.AddCategory(newCategory)

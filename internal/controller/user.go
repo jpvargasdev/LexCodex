@@ -2,6 +2,7 @@ package controller
 
 import (
 	"lexcodex/internal/models"
+	"lexcodex/internal/utils"
 	"log"
 	"net/http"
 
@@ -44,6 +45,12 @@ func (h *Controller) CreateUserController(c *gin.Context) {
 	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Validate email
+	if !utils.IsValidEmail(newUser.Email) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
 		return
 	}
 
