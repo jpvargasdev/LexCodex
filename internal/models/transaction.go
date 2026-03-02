@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/guregu/null/v5"
+	"github.com/jackc/pgx/v5"
 )
 
 const (
@@ -679,7 +680,7 @@ func AddTransfer(transaction Transaction) (Transaction, error) {
 	return transaction, nil
 }
 
-func DeleteTransaction(id string) error {
+func DeleteTransaction(id string, uid string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -696,14 +697,13 @@ func DeleteTransaction(id string) error {
 	}()
 
 	// Fetch the transaction details to retrieve its amount and account ID
+	// Also verify the transaction belongs to the user
 	var transaction Transaction
-
-	log.Printf("Transaction ID: %s", id)
 
 	err = tx.QueryRow(ctx,
 		`SELECT amount, account_id, related_account_id, transaction_type, fees
 		 FROM transactions 
-		 WHERE id = $1`, id,
+		 WHERE id = $1 AND user_id = $2`, id, uid,
 	).Scan(
 		&transaction.Amount,
 		&transaction.AccountID,
@@ -713,23 +713,17 @@ func DeleteTransaction(id string) error {
 	)
 
 	if err != nil {
-		return fmt.Errorf("Error retrieving transaction: %v", err)
-	}
-
-	if err == sql.ErrNoRows {
 		tx.Rollback(ctx)
-		return fmt.Errorf("transaction with ID %d not found", id)
-	} else if err != nil {
-		tx.Rollback(ctx)
+		if err == pgx.ErrNoRows {
+			return fmt.Errorf("transaction not found or access denied")
+		}
 		return fmt.Errorf("failed to retrieve transaction: %v", err)
 	}
 
-	log.Printf("Transaction ID 2: %s", id)
-
 	// Reverse the balance change for the source account
 	_, err = tx.Exec(ctx,
-		`UPDATE accounts SET balance = balance + ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
-		transaction.Amount, transaction.Fees, transaction.AccountID,
+		`UPDATE accounts SET balance = balance + ($1::NUMERIC + $2::NUMERIC) WHERE id = $3 AND user_id = $4`,
+		transaction.Amount, transaction.Fees, transaction.AccountID, uid,
 	)
 	if err != nil {
 		tx.Rollback(ctx)
@@ -741,8 +735,8 @@ func DeleteTransaction(id string) error {
 		transaction.TransactionType == TransactionTypeSavings &&
 			transaction.RelatedAccountID.Valid && transaction.RelatedAccountID.String != "" {
 		_, err = tx.Exec(ctx,
-			`UPDATE accounts SET balance = balance - ($1::NUMERIC + $2::NUMERIC) WHERE id = $3`,
-			transaction.Amount, transaction.Fees, transaction.RelatedAccountID,
+			`UPDATE accounts SET balance = balance - ($1::NUMERIC + $2::NUMERIC) WHERE id = $3 AND user_id = $4`,
+			transaction.Amount, transaction.Fees, transaction.RelatedAccountID, uid,
 		)
 		if err != nil {
 			tx.Rollback(ctx)
@@ -750,8 +744,8 @@ func DeleteTransaction(id string) error {
 		}
 	}
 
-	// Delete the transaction
-	_, err = tx.Exec(ctx, `DELETE FROM transactions WHERE id = $1`, id)
+	// Delete the transaction (also filtered by user_id for extra safety)
+	_, err = tx.Exec(ctx, `DELETE FROM transactions WHERE id = $1 AND user_id = $2`, id, uid)
 	if err != nil {
 		tx.Rollback(ctx)
 		return fmt.Errorf("failed to delete transaction: %v", err)

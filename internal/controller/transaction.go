@@ -141,7 +141,13 @@ func (h *Controller) AddTransactionController(c *gin.Context) {
 func (h *Controller) DeleteTransactionController(c *gin.Context) {
 	idParam := c.Param("id")
 
-	err := models.DeleteTransaction(idParam)
+	uid, err := utils.GetUserUID(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	err = models.DeleteTransaction(idParam, uid)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Transaction not found"})
