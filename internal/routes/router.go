@@ -66,7 +66,7 @@ func SetupRouter() *gin.Engine {
 		user := v1.Group("/users", middleware.AuthMiddleware())
 		{
 			user.POST("/create", c.CreateUserController)
-			// user.POST("/delete", c.DeleteUserController)
+			user.DELETE("", c.DeleteUserController)
 		}
 		helpers := v1.Group("/helpers", middleware.AuthMiddleware())
 		{
