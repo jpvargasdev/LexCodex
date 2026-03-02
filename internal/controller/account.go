@@ -56,9 +56,8 @@ func (h *Controller) AddAccountController(c *gin.Context) {
 
 	account, err := models.AddAccount(newAccount) // Add account to storage
 	if err != nil {
-		// You can log the error or return it, depending on your application's needs
 		log.Printf("Error adding account: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add acccount"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add account"})
 		return
 	}
 	c.JSON(http.StatusCreated, account)
@@ -79,14 +78,13 @@ func (h *Controller) UpdateAccountController(c *gin.Context) {
 
 	newAccount.UserID = uid
 
-	account, err := models.UpdateAccount(newAccount) // Add account to storage
+	account, err := models.UpdateAccount(newAccount)
 	if err != nil {
-		// You can log the error or return it, depending on your application's needs
-		log.Printf("Error adding account: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add acccount"})
+		log.Printf("Error updating account: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update account"})
 		return
 	}
-	c.JSON(http.StatusCreated, account)
+	c.JSON(http.StatusOK, account)
 }
 
 func (h *Controller) DeleteAccountController(c *gin.Context) {
@@ -98,11 +96,10 @@ func (h *Controller) DeleteAccountController(c *gin.Context) {
 
 	idParam := c.Param("id")
 
-	err = models.DeleteAccount(idParam, uid) // delete account
+	err = models.DeleteAccount(idParam, uid)
 	if err != nil {
-		// You can log the error or return it, depending on your application's needs
-		log.Printf("Error adding account: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete acccount"})
+		log.Printf("Error deleting account: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete account"})
 		return
 	}
 	c.JSON(http.StatusOK, "OK")
