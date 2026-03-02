@@ -41,7 +41,8 @@ func GetBudgetSummary(startDay string, endDay string, uid string) (BudgetSummary
         SELECT COALESCE(SUM(amount), 0) 
         FROM transactions
         WHERE transaction_type = 'Income' 
-          AND date BETWEEN $1 AND $2`, start, end).Scan(&summary.TotalIncome)
+          AND date BETWEEN $1 AND $2
+          AND user_id = $3`, start, end, uid).Scan(&summary.TotalIncome)
 	if err != nil {
 		return summary, fmt.Errorf("failed to retrieve total income: %v", err)
 	}
@@ -51,7 +52,8 @@ func GetBudgetSummary(startDay string, endDay string, uid string) (BudgetSummary
         SELECT COALESCE(SUM(amount), 0) 
         FROM transactions
         WHERE transaction_type = 'Expense' 
-          AND date BETWEEN $1 AND $2`, start, end).Scan(&summary.TotalExpenses)
+          AND date BETWEEN $1 AND $2
+          AND user_id = $3`, start, end, uid).Scan(&summary.TotalExpenses)
 	if err != nil {
 		return summary, fmt.Errorf("failed to retrieve total expenses: %v", err)
 	}
@@ -77,7 +79,8 @@ func GetBudgetSummary(startDay string, endDay string, uid string) (BudgetSummary
         FROM transactions
         WHERE transaction_type = 'Expense' 
           AND date BETWEEN $1 AND $2
-        GROUP BY main_category`, start, end)
+          AND user_id = $3
+        GROUP BY main_category`, start, end, uid)
 	if err != nil {
 		return summary, fmt.Errorf("failed to retrieve expenses: %v", err)
 	}
