@@ -14,18 +14,21 @@ import (
 
 // @title           LexCodex API
 // @version         1.0
-// @description     This is the LexCodex API
+// @description     Personal expense tracking API with 50/30/20 budget management
 
 // @contact.name   Juan Vargas
 // @contact.url    https://github.com/jpvargasdev/LexCodex
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
 
 // @host      localhost:8080
 // @BasePath  /api/v1
 
-// @securityDefinitions.basic  BasicAuth
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Firebase ID Token (Bearer token)
 
 // @externalDocs.description  OpenAPI
 

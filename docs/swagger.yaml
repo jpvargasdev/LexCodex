@@ -1,22 +1,210 @@
 basePath: /api/v1
+definitions:
+  models.Account:
+    properties:
+      balance:
+        description: Balance of the account (optional)
+        type: number
+      currency:
+        description: Currency of the account (e.g., "USD", "EUR")
+        type: string
+      id:
+        type: string
+      name:
+        description: Name of the account (e.g., "Checking Account", "Credit Card")
+        type: string
+      type:
+        description: Type of account (e.g., "Bank", "Credit Card", "Cash")
+        type: string
+      user_id:
+        type: string
+    type: object
 externalDocs:
   description: OpenAPI
-  url: https://swagger.io/resources/open-api/
 host: localhost:8080
 info:
   contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server celler server.
+    name: Juan Vargas
+    url: https://github.com/jpvargasdev/LexCodex
+  description: Personal expense tracking API with 50/30/20 budget management
   license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Swagger Example API
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: LexCodex API
   version: "1.0"
-paths: {}
+paths:
+  /accounts:
+    get:
+      consumes:
+      - application/json
+      description: Get all accounts for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Account'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all accounts
+      tags:
+      - accounts
+    post:
+      consumes:
+      - application/json
+      description: Create a new financial account for the authenticated user
+      parameters:
+      - description: Account object
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/models.Account'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Account'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new account
+      tags:
+      - accounts
+  /accounts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an account for the authenticated user
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete an account
+      tags:
+      - accounts
+    put:
+      consumes:
+      - application/json
+      description: Update an existing account for the authenticated user
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Account object
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/models.Account'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Account'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update an account
+      tags:
+      - accounts
+  /health:
+    get:
+      description: Returns OK if the server is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  BearerAuth:
+    description: Firebase ID Token (Bearer token)
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

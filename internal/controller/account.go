@@ -9,19 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAccounts godoc
-// @Summary      Get accounts
-// @Description  get accounts
+// GetAccountsController godoc
+// @Summary      Get all accounts
+// @Description  Get all accounts for the authenticated user
 // @Tags         accounts
 // @Accept       json
 // @Produce      json
-// @Param        id   path      int  true  "Account ID"
-// @Success      200  {object}  model.Account
-// @Failure      400  {object}  httputil.HTTPError
-// @Failure      404  {object}  httputil.HTTPError
-// @Failure      500  {object}  httputil.HTTPError
-// @Router       /accounts/{id} [get]
-
+// @Security     BearerAuth
+// @Success      200  {array}   models.Account
+// @Failure      401  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /accounts [get]
 func (h *Controller) GetAccountsController(c *gin.Context) {
 	uid, err := utils.GetUserUID(c)
 	if err != nil {
@@ -39,6 +37,19 @@ func (h *Controller) GetAccountsController(c *gin.Context) {
 	c.JSON(http.StatusOK, accounts)
 }
 
+// AddAccountController godoc
+// @Summary      Create a new account
+// @Description  Create a new financial account for the authenticated user
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        account  body      models.Account  true  "Account object"
+// @Success      201      {object}  models.Account
+// @Failure      400      {object}  map[string]string
+// @Failure      401      {object}  map[string]string
+// @Failure      500      {object}  map[string]string
+// @Router       /accounts [post]
 func (h *Controller) AddAccountController(c *gin.Context) {
 	uid, err := utils.GetUserUID(c)
 	if err != nil {
@@ -63,6 +74,20 @@ func (h *Controller) AddAccountController(c *gin.Context) {
 	c.JSON(http.StatusCreated, account)
 }
 
+// UpdateAccountController godoc
+// @Summary      Update an account
+// @Description  Update an existing account for the authenticated user
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id       path      string          true  "Account ID"
+// @Param        account  body      models.Account  true  "Account object"
+// @Success      200      {object}  models.Account
+// @Failure      400      {object}  map[string]string
+// @Failure      401      {object}  map[string]string
+// @Failure      500      {object}  map[string]string
+// @Router       /accounts/{id} [put]
 func (h *Controller) UpdateAccountController(c *gin.Context) {
 	uid, err := utils.GetUserUID(c)
 	if err != nil {
@@ -87,6 +112,18 @@ func (h *Controller) UpdateAccountController(c *gin.Context) {
 	c.JSON(http.StatusOK, account)
 }
 
+// DeleteAccountController godoc
+// @Summary      Delete an account
+// @Description  Delete an account for the authenticated user
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path      string  true  "Account ID"
+// @Success      200 {string}  string  "OK"
+// @Failure      401 {object}  map[string]string
+// @Failure      500 {object}  map[string]string
+// @Router       /accounts/{id} [delete]
 func (h *Controller) DeleteAccountController(c *gin.Context) {
 	uid, err := utils.GetUserUID(c)
 	if err != nil {
