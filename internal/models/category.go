@@ -99,7 +99,7 @@ func GetMainCategory(id string) (string, error) {
 	err := db.QueryRow(ctx, "SELECT main_category FROM categories WHERE id = $1", id).Scan(&mainCategory)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return "", fmt.Errorf("subcategory '%d' not found in categories table", id)
+			return "", fmt.Errorf("category '%s' not found in categories table", id)
 		}
 		return "", err
 	}
@@ -115,7 +115,7 @@ func GetSubCategory(id string) (string, error) {
 	err := db.QueryRow(ctx, "SELECT name FROM categories WHERE id = $1", id).Scan(&subCategory)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return "", fmt.Errorf("subcategory '%d' not found in categories table", id)
+			return "", fmt.Errorf("subcategory '%s' not found in categories table", id)
 		}
 		return "", err
 	}
