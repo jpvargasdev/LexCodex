@@ -16,7 +16,7 @@ func (h *Controller) GetIncomesController(c *gin.Context) {
 		return
 	}
 
-	accountParam := c.Query("account")
+	accountParam := c.Query("account_id")
 
 	incomes, err := models.GetTransactions(models.TransactionTypeIncome, accountParam, "", uid)
 	if err != nil {
