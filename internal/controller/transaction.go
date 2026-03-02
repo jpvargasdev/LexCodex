@@ -84,8 +84,9 @@ func (h *Controller) GetTransactionsController(c *gin.Context) {
 	typeParam := c.Query("type")
 	accountParam := c.Query("account")
 	limitParam := c.Query("limit")
+	offsetParam := c.Query("offset")
 
-	transactions, err := models.GetTransactions(typeParam, accountParam, limitParam, uid)
+	transactions, err := models.GetTransactions(typeParam, accountParam, limitParam, offsetParam, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

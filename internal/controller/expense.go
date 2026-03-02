@@ -17,8 +17,10 @@ func (h *Controller) GetExpensesController(c *gin.Context) {
 	}
 
 	accountParam := c.Query("account_id")
+	limitParam := c.Query("limit")
+	offsetParam := c.Query("offset")
 
-	expenses, err := models.GetTransactions(models.TransactionTypeExpense, accountParam, "", uid)
+	expenses, err := models.GetTransactions(models.TransactionTypeExpense, accountParam, limitParam, offsetParam, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

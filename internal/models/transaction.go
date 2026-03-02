@@ -160,7 +160,7 @@ func GetTransactionByID(transactionID string, userID string) (Transaction, error
 	return transaction, nil
 }
 
-func GetTransactions(transactionType string, accountId string, limitParam string, uid string) ([]Transaction, error) {
+func GetTransactions(transactionType string, accountId string, limitParam string, offsetParam string, uid string) ([]Transaction, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -211,6 +211,16 @@ func GetTransactions(transactionType string, accountId string, limitParam string
 		if err == nil { // Ensure limit is a valid integer
 			query += fmt.Sprintf(" LIMIT $%d", argIndex)
 			args = append(args, limitParam)
+			argIndex++
+		}
+	}
+
+	if offsetParam != "" {
+		_, err := strconv.Atoi(offsetParam)
+		if err == nil { // Ensure offset is a valid integer
+			query += fmt.Sprintf(" OFFSET $%d", argIndex)
+			args = append(args, offsetParam)
+			argIndex++
 		}
 	}
 

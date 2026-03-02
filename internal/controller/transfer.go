@@ -16,9 +16,11 @@ func (h *Controller) GetTransfersController(c *gin.Context) {
 		return
 	}
 
-	id := c.Query("account")
+	accountParam := c.Query("account_id")
+	limitParam := c.Query("limit")
+	offsetParam := c.Query("offset")
 
-	expenses, err := models.GetTransactions(models.TransactionTypeTransfer, id, "", uid)
+	expenses, err := models.GetTransactions(models.TransactionTypeTransfer, accountParam, limitParam, offsetParam, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
