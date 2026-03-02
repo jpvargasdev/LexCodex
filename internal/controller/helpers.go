@@ -22,6 +22,10 @@ func (h *Controller) RecalculateAllAccountBalances(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
-	models.RecalculateAllAccountBalances(ctx, uid)
+	err = models.RecalculateAllAccountBalances(ctx, uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to recalculate account balances"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"message": "Account balances recalculated successfully"})
 }
