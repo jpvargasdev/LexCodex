@@ -13,13 +13,14 @@ type Category struct {
 	ID           string `json:"id"`
 	Name         string `json:"name"`
 	MainCategory string `json:"main_category"`
+	UserID       string `json:"user_id,omitempty"`
 }
 
-func GetCategories() ([]Category, error) {
+func GetCategories(uid string) ([]Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	rows, err := db.Query(ctx, "SELECT id, name, main_category FROM categories")
+	rows, err := db.Query(ctx, "SELECT id, name, main_category FROM categories WHERE user_id = $1", uid)
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +46,8 @@ func AddCategory(category Category) (Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	query := "INSERT INTO categories (name, main_category) VALUES ($1, $2) RETURNING id"
-	err := db.QueryRow(ctx, query, category.Name, category.MainCategory).Scan(&category.ID)
+	query := "INSERT INTO categories (name, main_category, user_id) VALUES ($1, $2, $3) RETURNING id"
+	err := db.QueryRow(ctx, query, category.Name, category.MainCategory, category.UserID).Scan(&category.ID)
 	if err != nil {
 		return Category{}, err
 	}
@@ -60,8 +61,8 @@ func UpdateCategory(category Category) (Category, error) {
 	defer cancel()
 
 	_, err := db.Exec(ctx,
-		"UPDATE categories SET name = $1, main_category = $2 WHERE id = $3",
-		category.Name, category.MainCategory, category.ID,
+		"UPDATE categories SET name = $1, main_category = $2 WHERE id = $3 AND user_id = $4",
+		category.Name, category.MainCategory, category.ID, category.UserID,
 	)
 
 	if err != nil {
@@ -78,8 +79,8 @@ func DeleteCategory(category Category) error {
 	defer cancel()
 
 	_, err := db.Exec(ctx,
-		"DELETE FROM categories WHERE id = $1",
-		category.ID,
+		"DELETE FROM categories WHERE id = $1 AND user_id = $2",
+		category.ID, category.UserID,
 	)
 
 	if err != nil {
