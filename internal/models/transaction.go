@@ -268,18 +268,31 @@ func GetTransactionsForPeriod(start int64, end int64, transactionType string, ac
 
 	var conditions []string
 	var args []interface{}
+	argIndex := 1
 
-	conditions = append(conditions, "user_id = $1")
+	conditions = append(conditions, fmt.Sprintf("user_id = $%d", argIndex))
 	args = append(args, uid)
+	argIndex++
+
+	// Add date range filter
+	conditions = append(conditions, fmt.Sprintf("date >= $%d", argIndex))
+	args = append(args, start)
+	argIndex++
+
+	conditions = append(conditions, fmt.Sprintf("date <= $%d", argIndex))
+	args = append(args, end)
+	argIndex++
 
 	if transactionType != "" {
-		conditions = append(conditions, "transaction_type = $2")
+		conditions = append(conditions, fmt.Sprintf("transaction_type = $%d", argIndex))
 		args = append(args, transactionType)
+		argIndex++
 	}
 
 	if accountId != "" {
-		conditions = append(conditions, "account_id = $3")
+		conditions = append(conditions, fmt.Sprintf("account_id = $%d", argIndex))
 		args = append(args, accountId)
+		argIndex++
 	}
 
 	if len(conditions) > 0 {
