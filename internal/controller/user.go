@@ -23,7 +23,7 @@ func (h *Controller) DeleteUserController(c *gin.Context) {
 	err := models.DeleteUser(uid)
 	if err != nil {
 		log.Printf("Error deleting user: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to elete user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
 	}
 	c.JSON(http.StatusOK, "OK")
