@@ -67,7 +67,7 @@ func GetAccountByID(id null.String, uid string) (Account, error) {
 	)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return Account{}, fmt.Errorf("no account found with ID %d", id)
+			return Account{}, fmt.Errorf("no account found with ID %s", id.String)
 		}
 		return Account{}, err
 	}
@@ -111,7 +111,7 @@ func UpdateAccount(account Account) (Account, error) {
 
 	rowsAffected := result.RowsAffected()
 	if rowsAffected == 0 {
-		return Account{}, fmt.Errorf("no account found with ID %d", account.ID)
+		return Account{}, fmt.Errorf("no account found with ID %s", account.ID)
 	}
 
 	return account, nil
@@ -131,7 +131,7 @@ func DeleteAccount(id string, uid string) error {
 
 	rowsAffected := result.RowsAffected()
 	if rowsAffected == 0 {
-		return fmt.Errorf("no account found with ID %d", id)
+		return fmt.Errorf("no account found with ID %s", id)
 	}
 
 	return nil
