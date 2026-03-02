@@ -10,12 +10,8 @@ import (
 )
 
 var (
-	exchangeRates   map[string]float64
-	lastFetchTime   time.Time
-	baseCurrency    = "SEK" // Default currency, should I set this in .env file???
-	cacheCurrency   = "SEK"
-	apiKey          string
-	exchangeRateURL string
+	exchangeRates map[string]float64
+	lastFetchTime time.Time
 )
 
 type ExchangeRateResponse struct {
@@ -53,7 +49,6 @@ func FetchExchangeRates(currency string) error {
 
 	if res.StatusCode == http.StatusOK {
 		exchangeRates = data.ConversionRates
-		baseCurrency = currency
 		lastFetchTime = time.Now()
 		return nil
 	}
@@ -62,7 +57,7 @@ func FetchExchangeRates(currency string) error {
 }
 
 func GetExchangeRate(currency string) (float64, error) {
-	if currency == baseCurrency {
+	if currency == config.GetBaseCurrency() {
 		return 1.0, nil
 	}
 
@@ -76,8 +71,6 @@ func GetExchangeRate(currency string) (float64, error) {
 	if !exists {
 		return 0, fmt.Errorf("exchange rate not found for currency: %s", currency)
 	}
-
-	fmt.Println(rate)
 
 	return rate, nil
 }
