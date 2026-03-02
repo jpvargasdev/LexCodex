@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"lexcodex/internal/models"
@@ -104,7 +104,7 @@ func (h *Controller) GetTransactionByIdController(c *gin.Context) {
 
 	transaction, err := models.GetTransactionByID(id, uid)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Transaction not found"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -149,7 +149,7 @@ func (h *Controller) DeleteTransactionController(c *gin.Context) {
 
 	err = models.DeleteTransaction(idParam, uid)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if strings.Contains(err.Error(), "not found") {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Transaction not found"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

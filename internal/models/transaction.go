@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"lexcodex/internal/utils"
 	"lexcodex/internal/utils/timeutils"
@@ -152,7 +151,7 @@ func GetTransactionByID(transactionID string, userID string) (Transaction, error
 		&transaction.TransactionType,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return Transaction{}, fmt.Errorf("transaction not found")
 		}
 		return Transaction{}, fmt.Errorf("failed to retrieve transaction: %v", err)
