@@ -31,7 +31,6 @@ COPY --from=builder /app/lexcodex .
 COPY init_db.sql .
 COPY seed_db.sql .
 COPY entrypoint.sh .
-COPY wsgi.py .
 
 # Ensure entrypoint.sh is executable
 RUN chmod +x ./entrypoint.sh
