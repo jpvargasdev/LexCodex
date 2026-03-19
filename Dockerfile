@@ -1,5 +1,5 @@
 # Stage 1: Build the Go application
-FROM golang:1.23-alpine as builder
+FROM golang:1.25-alpine AS builder
 
 LABEL maintainer="Juan Vargas <vargasm.jp@gmail.com>"
 
