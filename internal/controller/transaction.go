@@ -124,24 +124,23 @@ func (h *Controller) AddTransactionController(c *gin.Context) {
 
 	var newTransaction models.Transaction
 	if err := c.ShouldBindJSON(&newTransaction); err != nil {
+		log.Printf("AddTransaction ShouldBindJSON error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Validate transaction type
 	if !utils.IsValidTransactionType(newTransaction.TransactionType) {
+		log.Printf("AddTransaction invalid transaction type: %s", newTransaction.TransactionType)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid transaction type. Supported: Income, Expense, Savings, Transfer"})
 		return
 	}
 
-	// Validate main category
-	if !utils.IsValidMainCategory(newTransaction.MainCategory) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid main category. Supported: Needs, Wants, Savings, Income, Transfer"})
-		return
-	}
+	// Note: main_category is derived from category_id in the model, so we don't validate it here
 
 	// Validate currency
 	if !utils.IsValidCurrency(newTransaction.Currency) {
+		log.Printf("AddTransaction invalid currency: %s", newTransaction.Currency)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid currency"})
 		return
 	}
