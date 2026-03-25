@@ -20,7 +20,8 @@ func GetCategories(uid string) ([]Category, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	rows, err := db.Query(ctx, "SELECT id, name, main_category FROM categories WHERE user_id = $1", uid)
+	// Get default categories (no user_id) AND user-specific categories
+	rows, err := db.Query(ctx, "SELECT id, name, main_category FROM categories WHERE user_id IS NULL OR user_id = $1", uid)
 	if err != nil {
 		return nil, err
 	}
