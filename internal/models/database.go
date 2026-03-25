@@ -44,7 +44,7 @@ var initialCategories = []CategorySeed{
 	{"Hobbies", "Wants"},
 	{"Taxi", "Wants"},
 	{"Restaurants", "Wants"},
-  {"Travels", "Wants"},
+	{"Travels", "Wants"},
 
 	{"Transfer", "Transfer"},
 	{"Salary", "Income"},
@@ -94,9 +94,10 @@ func CreateTables() error {
 	categoryTable := `CREATE TABLE IF NOT EXISTS categories (
 		id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		name TEXT UNIQUE NOT NULL,        
+		name TEXT NOT NULL,        
 		main_category TEXT NOT NULL,
-		user_id TEXT REFERENCES users(id) ON DELETE CASCADE
+		user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+		UNIQUE(name, user_id)
 	);`
 
 	transactionsTable := `CREATE TABLE IF NOT EXISTS transactions (

@@ -30,13 +30,16 @@ var ValidCurrencies = map[string]bool{
 
 // ValidAccountTypes contains the list of supported account types
 var ValidAccountTypes = map[string]bool{
-	"Bank":           true,
-	"Credit Card":    true,
-	"Cash":           true,
-	"Savings":        true,
-	"Investment":     true,
-	"Checking":       true,
-	"Digital Wallet": true,
+	"Checking Account":     true,
+	"Savings Account":      true,
+	"Credit Card":          true,
+	"Debit Card":           true,
+	"Cash":                 true,
+	"Investment Account":   true,
+	"Digital Wallet":       true,
+	"Money Market Account": true,
+	"Loan":                 true,
+	"Mortgage":             true,
 }
 
 // ValidMainCategories contains the list of supported main categories

@@ -44,12 +44,14 @@ func (h *Controller) CreateUserController(c *gin.Context) {
 
 	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
+		log.Printf("ShouldBindJSON error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Validate email
 	if !utils.IsValidEmail(newUser.Email) {
+		log.Printf("Invalid email format: %q", newUser.Email)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
 		return
 	}

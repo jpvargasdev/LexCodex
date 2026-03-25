@@ -62,16 +62,20 @@ func TestIsValidAccountType(t *testing.T) {
 		accountType string
 		want        bool
 	}{
-		{"Bank", "Bank", true},
+		{"Checking Account", "Checking Account", true},
+		{"Savings Account", "Savings Account", true},
 		{"Credit Card", "Credit Card", true},
+		{"Debit Card", "Debit Card", true},
 		{"Cash", "Cash", true},
-		{"Savings", "Savings", true},
-		{"Investment", "Investment", true},
-		{"Checking", "Checking", true},
+		{"Investment Account", "Investment Account", true},
 		{"Digital Wallet", "Digital Wallet", true},
+		{"Money Market Account", "Money Market Account", true},
+		{"Loan", "Loan", true},
+		{"Mortgage", "Mortgage", true},
 		{"invalid type", "Invalid", false},
 		{"empty type", "", false},
-		{"lowercase bank", "bank", false},
+		{"old Bank type", "Bank", false},
+		{"old Checking type", "Checking", false},
 	}
 
 	for _, tt := range tests {
