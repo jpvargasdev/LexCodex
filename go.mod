@@ -1,12 +1,12 @@
 module lexcodex
 
-go 1.24.0
+go 1.25.0
 
 require (
 	firebase.google.com/go/v4 v4.15.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/guregu/null/v5 v5.0.0
-	github.com/jackc/pgx/v5 v5.7.2
+	github.com/jackc/pgx/v5 v5.9.0
 	github.com/joho/godotenv v1.5.1
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
